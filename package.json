@@ -1,0 +1,15 @@
+{
+	"name": "teralo-app-concrete-reinforcement",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "teralo-app build",
+		"dev": "teralo-app publish --dev --to http://localhost:5173",
+		"test": "node --test test/"
+	},
+	"dependencies": {
+		"@teralo-co/apps": "^0.1.0",
+		"chart.js": "4.5.1"
+	},
+	"license": "MIT"
+}

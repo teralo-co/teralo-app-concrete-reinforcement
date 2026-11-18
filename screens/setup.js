@@ -96,25 +96,20 @@ function addMaterial(app) {
 		inputMode: 'decimal',
 		required: true
 	});
-	return h(
-		'form',
-		{
-			class: 'inline',
-			onsubmit: async (event) => {
-				event.preventDefault();
-				if (
-					await send('/materials', 'POST', { name: name.value, unit: unit.value, rate: rate.value })
-				) {
-					toast(`${name.value.trim()} added`, 'success');
-					await app.refresh();
-				}
+	return actionForm(
+		'Add',
+		async () => {
+			if (
+				await send('/materials', 'POST', { name: name.value, unit: unit.value, rate: rate.value })
+			) {
+				toast(`${name.value.trim()} added`, 'success');
+				await app.refresh();
 			}
 		},
 		h('h3', null, 'Add a material'),
 		field('Name', name),
 		field('Unit', unit),
-		field(`Rate per unit (${app.data.project.currency})`, rate),
-		h('button', { class: 'primary' }, 'Add')
+		field(`Rate per unit (${app.data.project.currency})`, rate)
 	);
 }
 
@@ -133,22 +128,17 @@ function changeRate(app) {
 		required: true
 	});
 	const from = h('input', { type: 'date', value: data.today });
-	return h(
-		'form',
-		{
-			class: 'inline',
-			onsubmit: async (event) => {
-				event.preventDefault();
-				if (
-					await send('/rates', 'POST', {
-						materialId: Number(material.value),
-						rate: rate.value,
-						from: from.value
-					})
-				) {
-					toast('Rate saved', 'success');
-					await app.refresh();
-				}
+	return actionForm(
+		'Save rate',
+		async () => {
+			const saved = await send('/rates', 'POST', {
+				materialId: Number(material.value),
+				rate: rate.value,
+				from: from.value
+			});
+			if (saved) {
+				toast('Rate saved', 'success');
+				await app.refresh();
 			}
 		},
 		h('h3', null, 'Change a rate'),
@@ -159,9 +149,41 @@ function changeRate(app) {
 		),
 		field('Material', material),
 		field(`New rate (${data.project.currency})`, rate),
-		field('Applies from', from),
-		h('button', { class: 'primary' }, 'Save rate')
+		field('Applies from', from)
 	);
+}
+
+/**
+ * A form whose button does the work. Teralo sandboxes an app's frame without allow-forms, so the
+ * browser drops a form's submission before its submit event fires: the button checks the fields
+ * and runs the action itself, and Enter in a field presses it.
+ */
+function actionForm(label, run, ...children) {
+	const button = h('button', { type: 'button', class: 'primary' }, label);
+	const form = h(
+		'form',
+		{
+			class: 'inline',
+			onkeydown: (event) => {
+				if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
+					event.preventDefault();
+					button.click();
+				}
+			}
+		},
+		...children,
+		button
+	);
+	button.addEventListener('click', async () => {
+		if (button.disabled || !form.reportValidity()) return;
+		button.disabled = true;
+		try {
+			await run();
+		} finally {
+			button.disabled = false;
+		}
+	});
+	return form;
 }
 
 function budgetEditor(app, m) {

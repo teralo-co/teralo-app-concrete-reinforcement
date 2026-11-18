@@ -1,7 +1,7 @@
 {
 	"id": "concrete-reinforcement",
 	"name": "Concrete and Reinforcement",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"teraloApi": 1,
 	"publisher": "Teralo",
 	"description": "Track concrete and reinforcement on a project: rates, a typed-in budget, delivery dockets and what is still to come, and from them the forecast final cost against budget. Any material with a unit and a rate works, so copy it for precast or anything else.",

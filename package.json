@@ -8,7 +8,7 @@
 		"test": "node --test test/"
 	},
 	"dependencies": {
-		"@teralo-co/apps": "^0.1.0",
+		"@teralo-co/apps": "^0.4.0",
 		"chart.js": "4.5.1"
 	},
 	"license": "MIT"
